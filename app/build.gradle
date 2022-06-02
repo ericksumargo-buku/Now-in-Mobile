@@ -1,0 +1,114 @@
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    id "kotlin-kapt"
+    id "dagger.hilt.android.plugin"
+}
+
+apply from: rootProject.file("plugins/jacoco.gradle")
+
+android {
+    compileSdkVersion sdk.compile
+
+    defaultConfig {
+        applicationId rootProject.applicationId
+
+        minSdkVersion sdk.min
+        targetSdkVersion sdk.target
+        versionCode sdk.code
+        versionName sdk.version
+
+        testInstrumentationRunner "com.nowinmobile.base.runner.HiltTestRunner"
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += [
+                    "room.schemaLocation"   : "$projectDir/schemas".toString(),
+                    "room.incremental"      : "true",
+                    "room.expandProjection" : "true"
+                ]
+            }
+        }
+    }
+
+    buildTypes {
+        debug {
+            buildConfigField "String", "API_KEY", API_KEY
+
+            minifyEnabled false
+            testCoverageEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+
+        release {
+            buildConfigField "String", "API_KEY", API_KEY
+
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    buildFeatures {
+        viewBinding = true
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        freeCompilerArgs = [
+            "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
+            "-Xopt-in=kotlinx.coroutines.FlowPreview",
+        ]
+
+        jvmTarget = JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    // Dagger - Hilt
+    implementation "com.google.dagger:hilt-android:$lib.dagger"
+    kapt "com.google.dagger:hilt-android-compiler:$lib.dagger"
+
+    androidTestImplementation "com.google.dagger:hilt-android-testing:$lib.dagger"
+    kaptAndroidTest "com.google.dagger:hilt-android-compiler:$lib.dagger"
+
+    // DataStore
+    implementation "androidx.datastore:datastore-preferences:$lib.datastore"
+
+    // Lifecycle
+    implementation "androidx.fragment:fragment-ktx:$lib.fragment"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lib.lifecycle"
+
+    // Room
+    implementation "androidx.room:room-runtime:$lib.room"
+    implementation "androidx.room:room-ktx:$lib.room"
+    kapt "androidx.room:room-compiler:$lib.room"
+
+    // Retrofit
+    implementation "com.squareup.retrofit2:retrofit:$lib.retrofit"
+    implementation "com.squareup.retrofit2:converter-gson:$lib.retrofit"
+    implementation "com.squareup.okhttp3:logging-interceptor:$lib.okhttp"
+
+    // Coroutines
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$lib.coroutines"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$lib.coroutines"
+    androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$lib.coroutines"
+
+    // UI
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:$lib.swiperefreshlayout"
+    implementation "com.google.android.material:material:$lib.material"
+    implementation "androidx.constraintlayout:constraintlayout:$lib.constraintlayout"
+
+    // Testing
+    androidTestImplementation "androidx.test:core-ktx:$lib.test"
+    androidTestImplementation "androidx.arch.core:core-testing:$lib.arch"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$lib.espresso"
+    androidTestImplementation "app.cash.turbine:turbine:$lib.turbine"
+
+    // LeakCanary
+    debugImplementation "com.squareup.leakcanary:leakcanary-android:$lib.leakcanary"
+}
